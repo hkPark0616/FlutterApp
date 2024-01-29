@@ -1,16 +1,27 @@
-# fluttertest
+﻿# Flutter App Project
 
-A new Flutter project.
+## ⏳ 개발기간
 
-## Getting Started
+2024.01.13 ~ 
 
-This project is a starting point for a Flutter application.
+<br/>
 
-A few resources to get you started if this is your first Flutter project:
+## 📖 개요
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Flutter를 이용한 애플리케이션입니다.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
+####  Front-end
+  
+* <img src="https://img.shields.io/badge/Flutter-02569B?style=flat&logo=Flutter&logoColor=white"><br>
+
+####  Database
+
+* <img src="https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=MySQL&logoColor=white"><br>
+
+<br/>
+
+## 📄 애플리케이션 구성
+
+ * ### Login & Signup
+   로그인 및 회원가입 화면입니다.
