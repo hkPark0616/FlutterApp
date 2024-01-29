@@ -1,0 +1,12 @@
+import 'package:flutter/material.dart';
+
+class CommentsUpdator extends ChangeNotifier {
+  List _commentsList = [];
+  List get commentsList => _commentsList;
+
+  // 리스트 업데이트
+  void updateList(List newList) {
+    _commentsList = newList;
+    notifyListeners();
+  }
+}
