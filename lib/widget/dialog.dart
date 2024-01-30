@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:fluttertest/service/comment.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-Future<void> recommentDialog(BuildContext context, commentsInfo) {
+Future<void> recommentDialog(
+    BuildContext context, commentsInfo, String? currentUser) {
   String recommentsContent = '';
 
   final TextEditingController recommentsController = TextEditingController();
@@ -160,7 +161,8 @@ Future<void> recommentDialog(BuildContext context, commentsInfo) {
                               await insertRecomments(
                                   commentsInfo['postId'],
                                   commentsInfo['postNum'],
-                                  commentsInfo['cmt_writer'],
+                                  //commentsInfo['cmt_writer'],
+                                  currentUser,
                                   recommentsContent,
                                   commentsInfo['cmt_no']);
                               Fluttertoast.showToast(

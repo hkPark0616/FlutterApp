@@ -26,6 +26,8 @@ class DetailState extends State<DetailPage> {
   List commentsList = [];
   int commentCnt = 0;
 
+  late ScrollController _scrollController;
+
   final TextEditingController commentController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
@@ -35,6 +37,11 @@ class DetailState extends State<DetailPage> {
 
   @override
   void initState() {
+    _scrollController = ScrollController();
+    _scrollController.addListener(() {
+      /// 컨트롤러가 SingleChildScrollView에 연결이 됐는지 안돼는지
+      _scrollController.hasClients;
+    });
     super.initState();
     _loadUserInfo();
     loadComments();
@@ -244,319 +251,357 @@ class DetailState extends State<DetailPage> {
               isComments = true;
             });
           },
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                ListTile(
-                  title: Text(
-                    content['postTitle'],
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-                  subtitle: Text(
-                    content['postWriter'] + "    " + content['postDate'],
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const Divider(
-                  indent: 10,
-                  endIndent: 10,
-                  height: 1,
-                  color: Color.fromARGB(255, 122, 122, 122),
-                ),
-
-                // content
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                        left: 18.0, right: 18.0, top: 10, bottom: 10),
-                    child: Text(
-                      content['postContent'],
-                      style: const TextStyle(fontSize: 16),
-                      textAlign: TextAlign.start,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 18, bottom: 12, top: 13),
-                  child: Row(
-                    children: [
-                      // postLike
-                      const Icon(
-                        Icons.thumb_up_alt,
-                        color: Color.fromARGB(255, 116, 116, 116),
-                        size: 17,
-                      ),
-                      const SizedBox(
-                        width: 3,
-                      ),
-                      Text(
-                        content['postLike'],
-                        style: const TextStyle(
-                            color: Color.fromARGB(255, 116, 116, 116),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-
-                      // post comment count
-                      const Icon(
-                        Icons.chat_rounded,
-                        color: Color.fromARGB(255, 116, 116, 116),
-                        size: 17,
-                      ),
-                      const SizedBox(
-                        width: 3,
-                      ),
-                      Text(
-                        commentCnt.toString(),
-                        style: const TextStyle(
-                            color: Color.fromARGB(255, 116, 116, 116),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14),
-                      ),
-                    ],
-                  ),
-                ),
-                const Padding(
-                  padding: EdgeInsets.only(left: 20, bottom: 7),
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: Text(
-                      '댓글',
-                      style: TextStyle(
+          child: ScrollConfiguration(
+            behavior: const ScrollBehavior().copyWith(overscroll: false),
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              child: Column(
+                children: [
+                  ListTile(
+                    title: Text(
+                      content['postTitle'],
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Color.fromARGB(255, 116, 116, 116),
+                        fontSize: 18,
+                      ),
+                    ),
+                    subtitle: Text(
+                      content['postWriter'] + "    " + content['postDate'],
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                ),
+                  const Divider(
+                    indent: 10,
+                    endIndent: 10,
+                    height: 1,
+                    color: Color.fromARGB(255, 122, 122, 122),
+                  ),
 
-                // Comment
-                FutureBuilder(
-                  future: loadComments(),
-                  builder: (context, snapshot) {
-                    commentsList =
-                        context.watch<CommentsUpdator>().commentsList;
+                  // content
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 18.0, right: 18.0, top: 10, bottom: 10),
+                      child: Text(
+                        content['postContent'],
+                        style: const TextStyle(fontSize: 16),
+                        textAlign: TextAlign.start,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(left: 18, bottom: 12, top: 13),
+                    child: Row(
+                      children: [
+                        // postLike
+                        const Icon(
+                          Icons.thumb_up_alt,
+                          color: Color.fromARGB(255, 116, 116, 116),
+                          size: 17,
+                        ),
+                        const SizedBox(
+                          width: 3,
+                        ),
+                        Text(
+                          content['postLike'],
+                          style: const TextStyle(
+                              color: Color.fromARGB(255, 116, 116, 116),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
 
-                    return ListView.builder(
-                      primary: false,
-                      shrinkWrap: true,
-                      itemCount: commentsList.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        dynamic commentsInfo = commentsList[index];
+                        // post comment count
+                        const Icon(
+                          Icons.chat_rounded,
+                          color: Color.fromARGB(255, 116, 116, 116),
+                          size: 17,
+                        ),
+                        const SizedBox(
+                          width: 3,
+                        ),
+                        Text(
+                          commentCnt.toString(),
+                          style: const TextStyle(
+                              color: Color.fromARGB(255, 116, 116, 116),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.only(left: 20, bottom: 7),
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: Text(
+                        '댓글',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Color.fromARGB(255, 116, 116, 116),
+                        ),
+                      ),
+                    ),
+                  ),
 
-                        //String postNum = commentsInfo['postNum'];
-                        //String postId = commentsInfo['postId'];
-                        String commentsNum = commentsInfo['cmt_no'];
-                        String comments = commentsInfo['content'];
-                        //String? parent = commentsInfo['parent'];
-                        String depth = commentsInfo['depth'];
-                        //String seq = commentsInfo['seq'];
-                        String commentsDate = commentsInfo['date'];
-                        String commentsWriter = commentsInfo['cmt_writer'];
+                  // Comment
+                  FutureBuilder(
+                    future: loadComments(),
+                    builder: (context, snapshot) {
+                      commentsList =
+                          context.watch<CommentsUpdator>().commentsList;
 
-                        // used to width percentage(example: width * 0.85 ==> 85% whole width)
-                        double width = MediaQuery.of(context).size.width;
+                      return ListView.builder(
+                        primary: false,
+                        shrinkWrap: true,
+                        itemCount: commentsList.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          dynamic commentsInfo = commentsList[index];
 
-                        if (depth == "1") {
-                          return Column(
-                            children: [
-                              Padding(
-                                  padding: const EdgeInsets.only(top: 5.0),
-                                  child: index == 0
-                                      ? const Divider(
-                                          height: 2,
-                                          thickness: 1.1,
-                                          endIndent: 10,
-                                          indent: 10,
-                                          color: Color.fromARGB(
-                                              255, 122, 122, 122),
-                                        )
-                                      : const Padding(
-                                          padding: EdgeInsets.only(top: 8.0),
-                                          child: Divider(
-                                            height: 1,
-                                            endIndent: 15,
-                                            indent: 15,
+                          //String postNum = commentsInfo['postNum'];
+                          //String postId = commentsInfo['postId'];
+                          String commentsNum = commentsInfo['cmt_no'];
+                          String comments = commentsInfo['content'];
+                          //String? parent = commentsInfo['parent'];
+                          String depth = commentsInfo['depth'];
+                          //String seq = commentsInfo['seq'];
+                          String commentsDate = commentsInfo['date'];
+                          String commentsWriter = commentsInfo['cmt_writer'];
+
+                          // used to width percentage(example: width * 0.85 ==> 85% whole width)
+                          double width = MediaQuery.of(context).size.width;
+
+                          if (depth == "1") {
+                            return Column(
+                              children: [
+                                Padding(
+                                    padding: const EdgeInsets.only(top: 5.0),
+                                    child: index == 0
+                                        ? const Divider(
+                                            height: 2,
+                                            thickness: 1.1,
+                                            endIndent: 10,
+                                            indent: 10,
                                             color: Color.fromARGB(
                                                 255, 122, 122, 122),
-                                          ),
-                                        )),
-                              Container(
-                                width: width * 0.85,
-                                padding: const EdgeInsets.only(top: 15),
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      commentsWriter,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
+                                          )
+                                        : const Padding(
+                                            padding: EdgeInsets.only(top: 8.0),
+                                            child: Divider(
+                                              height: 1,
+                                              endIndent: 15,
+                                              indent: 15,
+                                              color: Color.fromARGB(
+                                                  255, 122, 122, 122),
+                                            ),
+                                          )),
+                                Container(
+                                  width: width * 0.85,
+                                  padding: const EdgeInsets.only(top: 15),
+                                  child: Row(
+                                    children: [
+                                      commentsWriter == content['postWriter']
+                                          ? Text(
+                                              "$commentsWriter (글쓴이)",
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: Color.fromARGB(
+                                                    255, 93, 44, 228),
+                                              ),
+                                            )
+                                          : Text(
+                                              commentsWriter,
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                      // Text(
+                                      //   commentsWriter,
+                                      //   style: commentsWriter ==
+                                      //           content['postWriter']
+                                      //       ? const TextStyle(
+                                      //           fontWeight: FontWeight.bold,
+                                      //           color: Color.fromARGB(
+                                      //               255, 128, 82, 255),
+                                      //         )
+                                      //       : const TextStyle(
+                                      //           fontWeight: FontWeight.bold,
+                                      //         ),
+                                      // ),
+                                      const SizedBox(
+                                        width: 10,
                                       ),
-                                    ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Container(
-                                      margin: const EdgeInsets.only(top: 3),
-                                      child: Text(
-                                        commentsDate,
-                                        style: const TextStyle(
-                                          color: Color.fromARGB(
-                                              255, 122, 122, 122),
-                                          fontSize: 10,
-                                        ),
-                                      ),
-                                    ),
-                                    const Spacer(),
-                                    // if (depth == "1")
-                                    SizedBox(
-                                      height: 16,
-                                      width: 16,
-                                      child: IconButton(
-                                        padding: const EdgeInsets.all(0.0),
-                                        onPressed: () async {
-                                          // FocusScope.of(context)
-                                          //     .requestFocus(_contentsFocusNode);
-                                          await recommentDialog(
-                                              context, commentsInfo);
-                                          await loadComments();
-                                        },
-                                        icon: const Icon(
-                                          Icons.chat_bubble,
-                                          size: 15,
-                                          color: Color.fromARGB(
-                                              255, 116, 116, 116),
-                                        ),
-                                      ),
-                                    ),
-                                    // const SizedBox(
-                                    //   width: 10,
-                                    // ),
-                                    if (commentsWriter == currentUser)
                                       Container(
-                                        padding: const EdgeInsets.only(
-                                          left: 6,
+                                        margin: const EdgeInsets.only(top: 3),
+                                        child: Text(
+                                          commentsDate,
+                                          style: const TextStyle(
+                                            color: Color.fromARGB(
+                                                255, 122, 122, 122),
+                                            fontSize: 10,
+                                          ),
                                         ),
-                                        height: 18,
-                                        width: 18,
+                                      ),
+                                      const Spacer(),
+                                      // if (depth == "1")
+                                      SizedBox(
+                                        height: 16,
+                                        width: 16,
                                         child: IconButton(
                                           padding: const EdgeInsets.all(0.0),
                                           onPressed: () async {
-                                            await deleteCommentsDialog(
-                                                context, commentsNum);
+                                            // FocusScope.of(context)
+                                            //     .requestFocus(_contentsFocusNode);
+                                            await recommentDialog(context,
+                                                commentsInfo, currentUser);
                                             await loadComments();
                                           },
                                           icon: const Icon(
-                                            Icons.delete,
-                                            size: 18,
+                                            Icons.chat_bubble,
+                                            size: 15,
                                             color: Color.fromARGB(
                                                 255, 116, 116, 116),
                                           ),
                                         ),
                                       ),
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                padding:
-                                    const EdgeInsets.only(top: 10, bottom: 15),
-                                width: width * 0.85,
-                                child: Text(
-                                  comments,
-                                  textAlign: TextAlign.start,
-                                ),
-                              ),
-                            ],
-                          );
-                        } else {
-                          return Container(
-                            //color: const Color.fromARGB(122, 243, 211, 248),
-                            margin: const EdgeInsets.only(
-                                top: 3, left: 20, right: 10, bottom: 3),
-                            padding: const EdgeInsets.only(
-                                left: 10, right: 12, top: 15),
-                            decoration: const BoxDecoration(
-                                border: null,
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(10),
-                                ),
-                                color: Color.fromARGB(122, 243, 211, 248)),
-                            child: Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.only(right: 10),
-                                      child: const Icon(
-                                        Icons.subdirectory_arrow_right_rounded,
-                                        size: 20,
-                                      ),
-                                    ),
-                                    Text(
-                                      commentsWriter,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14),
-                                    ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Container(
-                                      margin: const EdgeInsets.only(top: 3),
-                                      child: Text(
-                                        commentsDate,
-                                        style: const TextStyle(
-                                          color: Color.fromARGB(
-                                              255, 122, 122, 122),
-                                          fontSize: 10,
-                                        ),
-                                      ),
-                                    ),
-                                    const Spacer(),
-                                    if (commentsWriter == currentUser)
-                                      Container(
-                                        width: 18,
-                                        height: 18,
-                                        child: IconButton(
-                                          padding: const EdgeInsets.all(0.0),
-                                          onPressed: () async {
-                                            await deleteRecommentsDialog(
-                                                context, commentsNum);
-                                            await loadComments();
-                                          },
-                                          icon: const Icon(
-                                            Icons.delete,
-                                            size: 18,
-                                            color: Color.fromARGB(
-                                                255, 116, 116, 116),
+                                      // const SizedBox(
+                                      //   width: 10,
+                                      // ),
+                                      if (commentsWriter == currentUser)
+                                        Container(
+                                          padding: const EdgeInsets.only(
+                                            left: 6,
+                                          ),
+                                          height: 18,
+                                          width: 18,
+                                          child: IconButton(
+                                            padding: const EdgeInsets.all(0.0),
+                                            onPressed: () async {
+                                              await deleteCommentsDialog(
+                                                  context, commentsNum);
+                                              await loadComments();
+                                            },
+                                            icon: const Icon(
+                                              Icons.delete,
+                                              size: 18,
+                                              color: Color.fromARGB(
+                                                  255, 116, 116, 116),
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                                 Container(
-                                  width: width * 0.95,
                                   padding: const EdgeInsets.only(
-                                      left: 30, bottom: 15, top: 10),
-                                  child: Text(comments),
+                                      top: 10, bottom: 15),
+                                  width: width * 0.85,
+                                  child: Text(
+                                    comments,
+                                    textAlign: TextAlign.start,
+                                  ),
                                 ),
                               ],
-                            ),
-                          );
-                        }
-                      },
-                    );
-                  },
-                ),
-              ],
+                            );
+                          } else {
+                            return Container(
+                              //color: const Color.fromARGB(122, 243, 211, 248),
+                              margin: const EdgeInsets.only(
+                                  top: 3, left: 20, right: 10, bottom: 3),
+                              padding: const EdgeInsets.only(
+                                  left: 10, right: 12, top: 15),
+                              decoration: const BoxDecoration(
+                                  border: null,
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(10),
+                                  ),
+                                  color: Color.fromARGB(122, 243, 211, 248)),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding:
+                                            const EdgeInsets.only(right: 10),
+                                        child: const Icon(
+                                          Icons
+                                              .subdirectory_arrow_right_rounded,
+                                          size: 20,
+                                        ),
+                                      ),
+                                      commentsWriter == content['postWriter']
+                                          ? Text(
+                                              "$commentsWriter (글쓴이)",
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: Color.fromARGB(
+                                                    255, 93, 44, 228),
+                                              ),
+                                            )
+                                          : Text(
+                                              commentsWriter,
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      Container(
+                                        margin: const EdgeInsets.only(top: 3),
+                                        child: Text(
+                                          commentsDate,
+                                          style: const TextStyle(
+                                            color: Color.fromARGB(
+                                                255, 122, 122, 122),
+                                            fontSize: 10,
+                                          ),
+                                        ),
+                                      ),
+                                      const Spacer(),
+                                      if (commentsWriter == currentUser)
+                                        Container(
+                                          width: 18,
+                                          height: 18,
+                                          child: IconButton(
+                                            padding: const EdgeInsets.all(0.0),
+                                            onPressed: () async {
+                                              await deleteRecommentsDialog(
+                                                  context, commentsNum);
+                                              await loadComments();
+                                            },
+                                            icon: const Icon(
+                                              Icons.delete,
+                                              size: 18,
+                                              color: Color.fromARGB(
+                                                  255, 116, 116, 116),
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                  Container(
+                                    width: width * 0.95,
+                                    padding: const EdgeInsets.only(
+                                        left: 30, bottom: 15, top: 10),
+                                    child: Text(comments),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                        },
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -655,6 +700,16 @@ class DetailState extends State<DetailPage> {
                                                     .commentsList;
                                           });
                                           loadComments();
+
+                                          Future.delayed(
+                                              const Duration(milliseconds: 500),
+                                              () {
+                                            _scrollController.animateTo(1200,
+                                                duration: const Duration(
+                                                    milliseconds: 1000),
+                                                curve: Curves.fastOutSlowIn);
+                                          });
+
                                           Fluttertoast.showToast(
                                             msg: '댓글 작성이 완료되었습니다.',
                                             toastLength: Toast.LENGTH_SHORT,
