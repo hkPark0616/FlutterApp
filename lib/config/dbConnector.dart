@@ -6,9 +6,9 @@ Future<MySQLConnection> dbConnector() async {
   final conn = await MySQLConnection.createConnection(
     host: "10.0.2.2",
     port: 3306,
-    userName: "userName",
-    password: "userpassword",
-    databaseName: "userdatabaseName", // optional
+    userName: "root",
+    password: "rainbow@6861",
+    databaseName: "flutter", // optional
   );
 
   await conn.connect();

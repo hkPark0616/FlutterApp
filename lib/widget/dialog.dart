@@ -133,7 +133,7 @@ Future<void> recommentDialog(
                         style: TextStyle(
                             color: Colors.black, fontWeight: FontWeight.bold),
                       ),
-                      content: const Text('답글 작성하시겠습니까?',
+                      content: const Text('답글을 작성하시겠습니까?',
                           textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.black)),
                       actions: [
@@ -225,7 +225,7 @@ Future<void> deleteCommentsDialog(BuildContext context, cmt_no) {
                 deleteComments(cmt_no);
                 Navigator.of(context).pop();
                 Fluttertoast.showToast(
-                  msg: '댓글이 삭제되었습니다..',
+                  msg: '댓글이 삭제되었습니다.',
                   toastLength: Toast.LENGTH_SHORT,
                   timeInSecForIosWeb: 1,
                   gravity: ToastGravity.BOTTOM,

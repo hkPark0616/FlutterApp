@@ -16,8 +16,13 @@ Future<IResultSet?> getPost() async {
   // 전체 게시글 불러오기
   try {
     results = await conn.execute(
-        "SELECT postNum, postId, postTitle, postContent, postDate, postWriter, writerId, postLike FROM post ORDER BY postDate DESC;");
-    // if (results.isNotEmpty || results != "null")
+        // """SELECT postNum, postId, postTitle, postContent, postDate, postWriter, writerId, postLike
+        //    FROM post
+        //    ORDER BY postDate DESC
+        //     LIMIT ${(page) * 20}, 20;""");
+        """SELECT postNum, postId, postTitle, postContent, postDate, postWriter, writerId, postLike
+       FROM post
+       ORDER BY postDate DESC;""");
     if (results.numOfRows > 0) {
       return results;
     }
@@ -116,4 +121,71 @@ Future<void> updatePost(String? postId, String? postNum, String? postTitle,
   } finally {
     await conn.close();
   }
+}
+
+Future<bool> isPostLike(String? postId, String? userEmail) async {
+  final conn = await dbConnector();
+
+  IResultSet? results;
+
+  try {
+    results = await conn.execute("""SELECT * 
+          FROM postlike 
+          WHERE userEmail = :userEmail AND postId = :postId;""", {
+      "postId": postId,
+      "userEmail": userEmail,
+    });
+    if (results.numOfRows > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (e) {
+    print('Error : $e');
+  } finally {
+    await conn.close();
+  }
+  return false;
+}
+
+Future<void> postLike(String? postId, String? userEmail) async {
+  final conn = await dbConnector();
+
+  try {
+    await conn
+        .execute("""INSERT INTO postlike VALUES(:userEmail, :postId);""", {
+      "postId": postId,
+      "userEmail": userEmail,
+    });
+    await conn.execute(
+        """UPDATE post SET postLIke = postLike + 1 WHERE postId = :postId;""",
+        {
+          "postId": postId,
+        });
+  } catch (e) {
+    print('Error : $e');
+  } finally {
+    await conn.close();
+  }
+}
+
+Future<IResultSet?> likeCnt(String? postId) async {
+  final conn = await dbConnector();
+
+  IResultSet? results;
+
+  try {
+    results = await conn
+        .execute("""SELECT postLike FROM post WHERE postId = :postId;""", {
+      "postId": postId,
+    });
+    if (results.numOfRows > 0) {
+      return results;
+    }
+  } catch (e) {
+    print('Error : $e');
+  } finally {
+    await conn.close();
+  }
+  return results;
 }

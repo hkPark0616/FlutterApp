@@ -42,5 +42,7 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
-lib/config/dbConnector.dart
+
+# .gitignore 파일 내용
+dbConnector.dart
 .gitignore

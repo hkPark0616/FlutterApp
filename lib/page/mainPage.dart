@@ -32,23 +32,38 @@ class MainState extends State<MainPage> {
 
   List items = [];
 
+  bool isLoading = false;
+  late int page;
+  ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
+    page = 0;
     _loadUserInfo();
     loadPost();
     //getPost();
+
+    //스크롤 감지하여 다음 페이지 불러오기
+    // _scrollController.addListener(() async {
+    //   if (_scrollController.position.pixels ==
+    //       _scrollController.position.maxScrollExtent) {
+    //     // 다음 페이지 불러오는 함수 호출
+    //     await loadMorePost();
+    //   }
+    // });
   }
 
   Future<void> loadPost() async {
     List postList = [];
     var memoInfo;
 
+    //var list = await getPost(page);
     var list = await getPost();
     for (final row in list!.rows) {
       memoInfo = {
         'postNum': row.colByName('postNum'),
-        'postId': row.colByName('postId'),
+        'postId': row.colByName('postId').toString(),
         'postTitle': row.colByName('postTitle'),
         'postContent': row.colByName('postContent'),
         'postDate': row.colByName('postDate'),
@@ -58,8 +73,51 @@ class MainState extends State<MainPage> {
       };
       postList.add(memoInfo);
     }
+
+    items.add(postList);
+
+    //items.addAll(postList);
+
     context.read<PostUpdator>().updateList(postList);
   }
+
+  // Future<void> loadMorePost() async {
+  //   setState(() {
+  //     isLoading = true;
+  //     page++;
+  //   });
+
+  //   try {
+  //     List postList = [];
+  //     var memoInfo;
+
+  //     var list = await getPost(page);
+  //     for (final row in list!.rows) {
+  //       memoInfo = {
+  //         'postNum': row.colByName('postNum'),
+  //         'postId': row.colByName('postId'),
+  //         'postTitle': row.colByName('postTitle'),
+  //         'postContent': row.colByName('postContent'),
+  //         'postDate': row.colByName('postDate'),
+  //         'postWriter': row.colByName('postWriter'),
+  //         'writerId': row.colByName('writerId'),
+  //         'postLike': row.colByName('postLike'),
+  //       };
+  //       postList.add(memoInfo);
+  //     }
+
+  //     setState(() {
+  //       items.addAll(postList);
+  //       isLoading = false;
+  //     });
+  //   } catch (error) {
+  //     print("Error loading more posts: $error");
+  //     // 에러 처리 로직 추가
+  //     setState(() {
+  //       isLoading = false;
+  //     });
+  //   }
+  // }
 
   void postClickEvent(BuildContext context, int index) async {
     dynamic content = items[index];
@@ -331,62 +389,6 @@ class MainState extends State<MainPage> {
                               ),
                             ),
                           ),
-                          // IconButton(
-                          //   onPressed: () {
-                          //     showDialog(
-                          //         context: context,
-                          //         builder: (BuildContext context) {
-                          //           return AlertDialog(
-                          //             shape: RoundedRectangleBorder(
-                          //                 borderRadius:
-                          //                     BorderRadius.circular(10)),
-                          //             title: const Text(
-                          //               '알림',
-                          //               style: TextStyle(
-                          //                   color: Colors.black,
-                          //                   fontWeight: FontWeight.bold),
-                          //             ),
-                          //             backgroundColor: Colors.white,
-                          //             content: const Column(
-                          //               mainAxisSize: MainAxisSize.min,
-                          //               children: [
-                          //                 Text('로그아웃 하시겠습니까?.',
-                          //                     textAlign: TextAlign.center,
-                          //                     style: TextStyle(
-                          //                         color: Colors.black)),
-                          //               ],
-                          //             ),
-                          //             actions: [
-                          //               TextButton(
-                          //                 child: const Text('OK'),
-                          //                 onPressed: () {
-                          //                   logout();
-                          //                   Navigator.of(context).pop();
-                          //                   Navigator.pushReplacement(
-                          //                     context,
-                          //                     MaterialPageRoute(
-                          //                       builder: (context) =>
-                          //                           const LoginPage(),
-                          //                     ),
-                          //                   );
-                          //                 },
-                          //               ),
-                          //             ],
-                          //           );
-                          //         });
-                          //   },
-                          //   icon: const Icon(Icons.logout_outlined),
-                          //   color: Colors.white,
-                          //   iconSize: 30,
-                          // ),
-                          // const Text(
-                          //   'Logout',
-                          //   style: TextStyle(
-                          //     fontSize: 16.0,
-                          //     fontWeight: FontWeight.bold,
-                          //     color: Colors.white,
-                          //   ),
-                          // ),
                         ],
                       ),
                     ),
@@ -397,7 +399,6 @@ class MainState extends State<MainPage> {
           ),
 
           // Post list
-
           body: Column(
             children: <Widget>[
               Expanded(
@@ -407,8 +408,11 @@ class MainState extends State<MainPage> {
                   child: FutureBuilder(
                     builder: (context, snapshot) {
                       items = context.watch<PostUpdator>().postList;
+
                       return ListView.builder(
+                        controller: _scrollController,
                         //padding: const EdgeInsets.only(top: 15),
+                        physics: const AlwaysScrollableScrollPhysics(),
                         itemCount: items.length,
                         itemBuilder: (BuildContext context, int index) {
                           // 메모 정보 저장
@@ -421,7 +425,7 @@ class MainState extends State<MainPage> {
                           // 'writerId': row.colByName('writerId'),
                           // 'postLike': row.colByName('postLike'),
                           dynamic memoInfo = items[index];
-                          String memoId = memoInfo['postId'];
+                          dynamic memoId = memoInfo['postId'];
                           String memoTitle = memoInfo['postTitle'];
                           String memoContent = memoInfo['postContent'];
                           String memoDate = memoInfo['postDate'];
@@ -458,6 +462,33 @@ class MainState extends State<MainPage> {
                                         maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
                                         textAlign: TextAlign.left,
+                                      ),
+                                    ),
+                                    Container(
+                                      width: width * 0.85,
+                                      alignment: Alignment.centerLeft,
+                                      padding: const EdgeInsets.only(bottom: 5),
+                                      child: Row(
+                                        children: [
+                                          const SizedBox(
+                                            child: Icon(
+                                              Icons.thumb_up_off_alt,
+                                              size: 15,
+                                              color: Colors.redAccent,
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 2),
+                                            child: Text(
+                                              memoLike,
+                                              style: const TextStyle(
+                                                  color: Colors.redAccent,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 13),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                     Container(
@@ -515,6 +546,12 @@ class MainState extends State<MainPage> {
                   ),
                 ),
               ),
+              // if (isLoading) // 로딩 중이면 로딩 아이콘 표시
+              //   Container(
+              //     padding: EdgeInsets.all(16),
+              //     alignment: Alignment.center,
+              //     child: CircularProgressIndicator(),
+              //   ),
             ],
           ),
 
