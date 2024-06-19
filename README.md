@@ -1,8 +1,8 @@
-﻿# Flutter App Project
+﻿# Flutter Demo App
 
 ## ⏳ 개발기간
 
-2024.01.13 ~ 
+2024.01.13 ~ 2024.02.01
 
 <br/>
 
